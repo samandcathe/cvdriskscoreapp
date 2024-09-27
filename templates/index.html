@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CVD Prediction Risk Score</title>
+    <style>
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            border-bottom: 1px dotted black;
+            margin-left: 5px;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: black;
+            color: #fff;
+            text-align: center;
+            border-radius: 5px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 100%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        label {
+            font-weight: bold;
+        }
+        .progress-bar {
+            width: 100%;
+            background-color: #f3f3f3;
+            border-radius: 25px;
+            margin-top: 10px;
+        }
+        .progress-bar-fill {
+            height: 20px;
+            width: 0;
+            background-color: #4CAF50;
+            border-radius: inherit;
+            text-align: center;
+            line-height: 20px;
+            color: white;
+        }
+        .low-risk {
+            background-color: green;
+        }
+        .moderate-risk {
+            background-color: orange;
+        }
+        .high-risk {
+            background-color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>CVD Prediction Risk Score</h1>
+
+    <form action="/predict" method="post">
+        <label for="SEX">Sex (0=Female, 1=Male):</label>
+        <input type="number" id="SEX" name="SEX" required>
+        <span class="tooltip">?
+            <span class="tooltiptext">0 = Female, 1 = Male</span>
+        </span>
+        <br><br>
+
+        <label for="AGE">Age:</label>
+        <input type="number" id="AGE" name="AGE" required>
+        <span class="tooltip">?
+            <span class="tooltiptext">Age in years</span>
+        </span>
+        <br><br>
+
+        <label for="BMI">BMI:</label>
+        <input type="number" id="BMI" name="BMI" required>
+        <span class="tooltip">?
+            <span class="tooltiptext">Body Mass Index</span>
+        </span>
+        <br><br>
+
+        <label for="CURSMOKE">Current Smoker (0=No, 1=Yes):</label>
+        <input type="number" id="CURSMOKE" name="CURSMOKE" required>
+        <span class="tooltip">?
+            <span class="tooltiptext">0 = Non-smoker, 1 = Smoker</span>
+        </span>
+        <br><br>
+
+        <label for="TOTCHOL">Total Cholesterol:</label>
+        <input type="number" id="TOTCHOL" name="TOTCHOL" required>
+        <span class="tooltip">?
+            <span class="tooltiptext">Cholesterol level in mg/dL</span>
+        </span>
+        <br><br>
+
+        <label for="DIABETES">Diabetes (0=No, 1=Yes):</label>
+        <input type="number" id="DIABETES" name="DIABETES" required>
+        <span class="tooltip">?
+            <span class="tooltiptext">0 = No Diabetes, 1 = Has Diabetes</span>
+        </span>
+        <br><br>
+
+        <label for="BPMEDS">BP Meds (0=No, 1=Yes):</label>
+        <input type="number" id="BPMEDS" name="BPMEDS" required>
+        <span class="tooltip">?
+            <span class="tooltiptext">0 = No BP Meds, 1 = On BP Meds</span>
+        </span>
+        <br><br>
+
+        <label for="HEARTRTE">Heart Rate:</label>
+        <input type="number" id="HEARTRTE" name="HEARTRTE" required>
+        <span class="tooltip">?
+            <span class="tooltiptext">Heart rate in beats per minute</span>
+        </span>
+        <br><br>
+
+        <label for="GLUCOSE">Glucose Level:</label>
+        <input type="number" id="GLUCOSE" name="GLUCOSE" required>
+        <span class="tooltip">?
+            <span class="tooltiptext">Blood glucose level</span>
+        </span>
+        <br><br>
+
+        <label for="HYPERTEN">Hypertension (0=No, 1=Yes):</label>
+        <input type="number" id="HYPERTEN" name="HYPERTEN" required>
+        <span class="tooltip">?
+            <span class="tooltiptext">0 = No hypertension, 1 = Hypertension present</span>
+        </span>
+        <br><br>
+
+        <label for="PREVIOUS_CVD_EVENT">Previous CVD Event (0=No, 1=Yes):</label>
+        <input type="number" id="PREVIOUS_CVD_EVENT" name="PREVIOUS_CVD_EVENT" required>
+        <span class="tooltip">?
+            <span class="tooltiptext">Previous cardiovascular events (previous history of heart attack, stroke, etc.)</span>
+        </span>
+        <br><br>
+
+        <label for="BPMAP">Blood Pressure MAP:</label>
+        <input type="number" id="BPMAP" name="BPMAP" required>
+        <span class="tooltip">?
+            <span class="tooltiptext">Mean Arterial Pressure</span>
+        </span>
+        <br><br>
+
+        <button type="submit">Predict</button>
+    </form>
+
+    {% if probability is not none %}
+        <h3>Prediction: {{ prediction }}</h3>
+        <p>Probability: {{ probability }}%</p>
+        <p>{{ note }}</p>
+
+        <!-- Risk Meter -->
+        <div class="progress-bar">
+            <div class="progress-bar-fill 
+                {% if probability <= 40 %} low-risk
+                {% elif probability <= 70 %} moderate-risk
+                {% else %} high-risk
+                {% endif %}" 
+                style="width: {{ probability }}%;">
+                {{ probability }}%
+            </div>
+        </div>
+    {% endif %}
+</body>
+</html>
+
+<!-- Disclaimer -->
+    <footer>
+        <p style="font-size: 12px; color: gray; margin-top: 20px;">
+            <strong>Disclaimer:</strong> The CVD Prediction Risk Score is an estimate based on the provided data and is not a substitute for professional medical advice, diagnosis, or treatment. Please consult a healthcare provider for more accurate information and guidance regarding cardiovascular risk.
+        </p>
+    </footer>
+</body>
+</html>
